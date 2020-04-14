@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using CRM.Data;
 using CRM.Data.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -14,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CRM
 {
@@ -33,6 +36,7 @@ namespace CRM
             {
                 cfg.User.RequireUniqueEmail = true;
             })
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<CRMContext>();
 
             services.AddDbContext<CRMContext>(cfg =>
@@ -40,9 +44,26 @@ namespace CRM
                 cfg.UseSqlServer(config.GetConnectionString("CRMConnectionString"));
             });
 
-            services.AddAuthentication()
-                .AddCookie()
-                .AddJwtBearer();
+            var key = Encoding.UTF8.GetBytes(config["Tokens:Key"].ToString());
+
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = false;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
 
             services.AddControllers();
 
@@ -50,7 +71,9 @@ namespace CRM
 
             services.AddScoped<CRMReposetory>();
 
-            services.AddMvc().AddNewtonsoftJson(options =>
+            services.AddMvc(options =>
+                options.EnableEndpointRouting = false)
+                .AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );
         }
@@ -72,9 +95,11 @@ namespace CRM
 
             app.UseCors("AllowAll");
 
-            app.UseEndpoints(endpoints =>
+            app.UseMvc(cfg =>
             {
-                endpoints.MapControllers();
+                cfg.MapRoute("Default",
+                    "{controller}/{action}",
+                    new { controller = "Processes", Action = "Get" });
             });
         }
     }

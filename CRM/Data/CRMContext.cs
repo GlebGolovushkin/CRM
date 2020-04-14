@@ -106,6 +106,22 @@ namespace CRM.Data
                 TimeEnd = new DateTime(),
                 Name = "Basic"
             });
+
+            modelBuilder.Entity<IdentityRole>().HasData(new IdentityRole
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "Head",
+                ConcurrencyStamp = "Head",
+                NormalizedName = "Head"
+            });
+
+            modelBuilder.Entity<IdentityRole>().HasData(new IdentityRole
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "Worker",
+                ConcurrencyStamp = "Worker",
+                NormalizedName = "Worker"
+            });
         }
     }
 }

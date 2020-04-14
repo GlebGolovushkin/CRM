@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CRM.Controllers
 {
@@ -35,34 +36,43 @@ namespace CRM.Controllers
         }
 
         [HttpPost("{password}")]
-        public async Task<IActionResult> AddUserAsync([FromBody]UserViewModel user, string password)
+        [Route("AddUser")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> AddUser([FromBody]UserViewModel user, string password)
         {
-            return Ok(await userManager.CreateAsync(mapper.Map<UserViewModel,User>(user), password));
+            var result = await userManager.CreateAsync(mapper.Map<UserViewModel, User>(user), password);
+            await userManager.AddToRoleAsync(mapper.Map<UserViewModel, User>(user), user.Role);
+
+            return Ok(result);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTokenAsync([FromBody]LoginModel model)
+        [Route("CreateToken")]
+        public async Task<IActionResult> CreateToken([FromBody]LoginModel model)
         {
             var user = await userManager.FindByNameAsync(model.UserName);
             var result = await signInManager.CheckPasswordSignInAsync(user, model.Password, false);
             if (result.Succeeded)
             {
-                var claims = new[]
+                var role = await userManager.GetRolesAsync(user);
+                IdentityOptions _options = new IdentityOptions();
+                var tokenDescriptor = new SecurityTokenDescriptor
                 {
-                    new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub, user.Email),
-                    new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                    Subject = new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim("UserID", user.Id.ToString())
+                        //new Claim(_options.ClaimsIdentity.RoleClaimType, role.FirstOrDefault())
+                    }),
+                    Expires = DateTime.UtcNow.AddDays(5),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Tokens:Key"])), SecurityAlgorithms.HmacSha256Signature)
                 };
-
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Tokens:Key"]));
-                var creds = new SigningCredentials(key, SecurityAlgorithms.EcdsaSha256);
-                var token = new JwtSecurityToken(
-                    "localhost",
-                    "audiance",
-                    claims,
-                    expires: DateTime.UtcNow.AddMinutes(30),
-                    signingCredentials: creds
-                    );
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+                var token = tokenHandler.WriteToken(securityToken);
+                return Ok(new { token });
             }
+
+            return BadRequest();
         }
     }
 }
