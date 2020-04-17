@@ -37,11 +37,11 @@ namespace CRM.Controllers
 
         [HttpPost("{password}")]
         [Route("AddUser")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> AddUser([FromBody]UserViewModel user, string password)
         {
-            var result = await userManager.CreateAsync(mapper.Map<UserViewModel, User>(user), password);
-            await userManager.AddToRoleAsync(mapper.Map<UserViewModel, User>(user), user.Role);
+            User applicationUser = mapper.Map<UserViewModel,User>(user);
+            await userManager.CreateAsync(applicationUser, password);
+            var result = await userManager.AddToRoleAsync(applicationUser, user.Role);
 
             return Ok(result);
         }
@@ -60,8 +60,8 @@ namespace CRM.Controllers
                 {
                     Subject = new ClaimsIdentity(new Claim[]
                     {
-                        new Claim("UserID", user.Id.ToString())
-                        //new Claim(_options.ClaimsIdentity.RoleClaimType, role.FirstOrDefault())
+                        new Claim("UserID", user.Id.ToString()),
+                        new Claim(_options.ClaimsIdentity.RoleClaimType, role.FirstOrDefault())
                     }),
                     Expires = DateTime.UtcNow.AddDays(5),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Tokens:Key"])), SecurityAlgorithms.HmacSha256Signature)

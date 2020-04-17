@@ -7,7 +7,7 @@ namespace CRM.ViewModels
 {
     public class ProcessViewModel
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
         public DateTime TimeStart { get; set; }
         public DateTime TimeEnd { get; set; }
         public string Name { get; set; }

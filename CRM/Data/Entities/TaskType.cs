@@ -7,7 +7,7 @@ namespace CRM.Data.Entities
 {
     public class TaskType
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
     }
 }

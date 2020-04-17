@@ -21,7 +21,6 @@ namespace CRM.Data
                 .ForMember(o => o.Id, vm => vm.MapFrom(o => o.Id))
                 .ForMember(vm => vm.Resources, opt => opt.MapFrom(x => x.Resources.Select(y => y.Resource).ToList()))
                 .ForMember(vm => vm.Products, opt => opt.MapFrom(x => x.Products.Select(y => y.Product).ToList()))
-                .ForMember(vm => vm.Users, opt => opt.MapFrom(x => x.Users.Select(y => y.User).ToList()))
                 .ReverseMap();
 
             CreateMap<User, UserViewModel>()

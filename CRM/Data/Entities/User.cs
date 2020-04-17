@@ -10,6 +10,6 @@ namespace CRM.Data.Entities
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public ICollection<TaskUser> Tasks { get; set; }
+        public ICollection<Task> Tasks { get; set; }
     }
 }

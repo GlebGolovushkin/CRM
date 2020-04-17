@@ -1,0 +1,1 @@
+{"version":3,"file":"task.component.js","sourceRoot":"","sources":["../../../../../ClientApp/app/tasks/task.component.ts"],"names":[],"mappings":";AAAA,OAAO,EAAE,SAAS,EAAE,MAAM,eAAe,CAAC;AAQ1C,IAAa,QAAQ,GAArB,MAAa,QAAQ;CAEpB,CAAA;AAFY,QAAQ;IANpB,SAAS,CAAC;QACP,QAAQ,EAAE,MAAM;QAChB,WAAW,EAAE,qBAAqB;QAClC,SAAS,EAAE,EAAE;KAChB,CAAC;GAEW,QAAQ,CAEpB;SAFY,QAAQ"}

@@ -20,7 +20,6 @@ namespace CRM.Data
             return ctx.Processes
                       .Include(p => p.Tasks)
                       .ThenInclude(p => p.Task)
-                      .ThenInclude(p => p.Users)
                       .ThenInclude(p => p.User)
                       .Include(p => p.Tasks)
                       .ThenInclude(p => p.Task)
@@ -30,6 +29,9 @@ namespace CRM.Data
                       .ThenInclude(p => p.Task)
                       .ThenInclude(p => p.Products)
                       .ThenInclude(p => p.Product)
+                      .Include(p => p.Tasks)
+                      .ThenInclude(p => p.Task)
+                      .ThenInclude(p => p.Type)
                       .OrderBy(p => p.Name)
                       .ToList();
         }
@@ -37,21 +39,20 @@ namespace CRM.Data
         public IEnumerable<Task> GetAllTasks()
         {
             return ctx.Tasks
-                      .Include(p => p.Users)
-                      .ThenInclude(p => p.User)
+                      .Include(p => p.User)
                       .Include(p => p.Resources)
                       .ThenInclude(p => p.Resource)
                       .Include(p => p.Products)
-                      .ThenInclude (p => p.Product)
+                      .ThenInclude(p => p.Product)
+                      .Include(p => p.Type)
                       .OrderBy(p => p.Name)
                       .ToList();
         }
 
-        public Task GetTaskById(string id)
+        public Task GetTaskById(int id)
         {
             return ctx.Tasks
-                      .Include(p => p.Users)
-                      .ThenInclude(p => p.User)
+                      .Include(p => p.User)
                       .Include(p => p.Resources)
                       .ThenInclude(p => p.Resource)
                       .Include(p => p.Products)

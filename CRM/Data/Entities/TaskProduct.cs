@@ -7,10 +7,10 @@ namespace CRM.Data.Entities
 {
     public class TaskProduct
     {
-        public string Id { get; set; }
-        public string TaskId { get; set; }
+        public int Id { get; set; }
+        public int TaskId { get; set; }
         public Task Task { get; set; }
-        public string ProductId { get; set; }
+        public int ProductId { get; set; }
         public Resource Product { get; set; }
     }
 }

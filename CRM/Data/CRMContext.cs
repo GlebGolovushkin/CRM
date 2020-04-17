@@ -35,6 +35,9 @@ namespace CRM.Data
                 .HasForeignKey(pt => pt.ProcessId);
 
             modelBuilder.Entity<ProcessTasks>().HasKey(p => p.Id);
+            modelBuilder.Entity<ProcessTasks>()
+            .Property(f => f.Id)
+            .ValueGeneratedOnAdd();
 
             modelBuilder.Entity<TaskResource>()
                 .HasOne(pt => pt.Resource)
@@ -47,6 +50,9 @@ namespace CRM.Data
                 .HasForeignKey(pt => pt.ResourceId);
 
             modelBuilder.Entity<TaskResource>().HasKey(p => p.Id);
+            modelBuilder.Entity<TaskResource>()
+            .Property(f => f.Id)
+            .ValueGeneratedOnAdd();
 
             modelBuilder.Entity<TaskProduct>()
                 .HasOne(pt => pt.Product)
@@ -59,34 +65,41 @@ namespace CRM.Data
                 .HasForeignKey(pt => pt.ProductId);
 
             modelBuilder.Entity<TaskProduct>().HasKey(p => p.Id);
+            modelBuilder.Entity<TaskProduct>()
+            .Property(f => f.Id)
+            .ValueGeneratedOnAdd();
 
-            modelBuilder.Entity<TaskUser>()
-                .HasOne(pt => pt.User)
-                .WithMany(p => p.Tasks)
-                .HasForeignKey(pt => pt.TaskId);
+            modelBuilder.Entity<Process>()
+            .Property(f => f.Id)
+            .ValueGeneratedOnAdd();
 
-            modelBuilder.Entity<TaskUser>()
-                .HasOne(pt => pt.Task)
-                .WithMany(t => t.Users)
-                .HasForeignKey(pt => pt.UserId);
+            modelBuilder.Entity<Resource>()
+            .Property(f => f.Id)
+            .ValueGeneratedOnAdd();
 
-            modelBuilder.Entity<TaskUser>().HasKey(p => p.Id);
+            modelBuilder.Entity<Task>()
+            .Property(f => f.Id)
+            .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<TaskType>()
+            .Property(f => f.Id)
+            .ValueGeneratedOnAdd();
 
             modelBuilder.Entity<TaskType>().HasData(new TaskType
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = 1,
                 Name = "Base"
             });
 
             modelBuilder.Entity<Resource>().HasData(new Resource
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = 1,
                 Name = "Test"
             });
 
             modelBuilder.Entity<Task>().HasData(new Task
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = 1,
                 IsStarted = false,
                 IsChangeTime = true,
                 IsStopped = true,
@@ -101,7 +114,7 @@ namespace CRM.Data
 
             modelBuilder.Entity<Process>().HasData(new Process
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = 1,
                 TimeStart = new DateTime(),
                 TimeEnd = new DateTime(),
                 Name = "Basic"

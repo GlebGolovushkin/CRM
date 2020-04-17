@@ -27,8 +27,8 @@ namespace CRM.Controllers
             return Ok(mapper.Map<IEnumerable<Task>, IEnumerable<TaskViewModel>>(tasks));
         }
 
-        [HttpGet("{id}")]
-        public IActionResult Get(string id)
+        [HttpGet("{id:int}")]
+        public IActionResult Get(int id)
         {
             return Ok(context.GetTaskById(id));
         }
