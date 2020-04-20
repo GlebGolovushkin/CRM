@@ -8,7 +8,7 @@ namespace CRM.Data.Entities
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public ICollection<TaskResource> Tasks { get; set; }
-        public ICollection<TaskProduct> TasksP { get; set; }
+        public ICollection<Task> ResourceTasks { get; set; }
+        public ICollection<Task> ProductTasks { get; set; }
     }
 }

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CRM.Data;
 using CRM.Data.Entities;
-using CRM.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -25,23 +24,31 @@ namespace CRM.Controllers
         private readonly SignInManager<User> signInManager;
         private readonly IMapper mapper;
         private readonly IConfiguration config;
+        private readonly CRMReposetory reposetory;
 
         public UsersController(UserManager<User> userManager, SignInManager<User> signInManager, IMapper mapper
-            , IConfiguration config)
+            , IConfiguration config, CRMReposetory reposetory)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.mapper = mapper;
             this.config = config;
+            this.reposetory = reposetory;
+        }
+
+        [HttpGet]
+        public IActionResult GetAllUsers()
+        {
+            return Ok(reposetory.GetAllUsers());
         }
 
         [HttpPost("{password}")]
         [Route("AddUser")]
-        public async Task<IActionResult> AddUser([FromBody]UserViewModel user, string password)
+        public async Task<IActionResult> AddUser([FromBody]User user, string password)
         {
-            User applicationUser = mapper.Map<UserViewModel,User>(user);
-            await userManager.CreateAsync(applicationUser, password);
-            var result = await userManager.AddToRoleAsync(applicationUser, user.Role);
+            User applicationUser = user;
+            var result = await userManager.CreateAsync(applicationUser, password);
+            //var result = await userManager.AddToRoleAsync(applicationUser, user.Role);
 
             return Ok(result);
         }

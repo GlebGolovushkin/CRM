@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace CRM.Migrations
 {
-    public partial class Sstart : Migration
+    public partial class Start : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -201,12 +201,16 @@ namespace CRM.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    ParentId = table.Column<int>(nullable: true),
+                    ProcessId = table.Column<int>(nullable: true),
+                    ResourceId = table.Column<int>(nullable: true),
+                    ProductId = table.Column<int>(nullable: true),
+                    TaskTypeId = table.Column<int>(nullable: true),
+                    UserId = table.Column<string>(nullable: true),
                     TimeStart = table.Column<DateTime>(nullable: false),
                     TimeEnd = table.Column<DateTime>(nullable: false),
                     CriticalDate = table.Column<DateTime>(nullable: false),
                     Name = table.Column<string>(nullable: true),
-                    UserId = table.Column<string>(nullable: true),
-                    TypeId = table.Column<int>(nullable: true),
                     TimeReserv = table.Column<DateTime>(nullable: false),
                     Priority = table.Column<int>(nullable: false),
                     IsImportant = table.Column<bool>(nullable: false),
@@ -214,20 +218,38 @@ namespace CRM.Migrations
                     IsChangeUsers = table.Column<bool>(nullable: false),
                     IsStarted = table.Column<bool>(nullable: false),
                     IsStopped = table.Column<bool>(nullable: false),
-                    ParentId = table.Column<int>(nullable: true)
+                    TaskId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Tasks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Tasks_Tasks_ParentId",
-                        column: x => x.ParentId,
+                        name: "FK_Tasks_Processes_ProcessId",
+                        column: x => x.ProcessId,
+                        principalTable: "Processes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Tasks_Resources_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Resources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Tasks_Resources_ResourceId",
+                        column: x => x.ResourceId,
+                        principalTable: "Resources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Tasks_Tasks_TaskId",
+                        column: x => x.TaskId,
                         principalTable: "Tasks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Tasks_Types_TypeId",
-                        column: x => x.TypeId,
+                        name: "FK_Tasks_Types_TaskTypeId",
+                        column: x => x.TaskTypeId,
                         principalTable: "Types",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -239,91 +261,13 @@ namespace CRM.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "ProcessTasks",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ProcessId = table.Column<int>(nullable: false),
-                    TaskId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProcessTasks", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ProcessTasks_Tasks_ProcessId",
-                        column: x => x.ProcessId,
-                        principalTable: "Tasks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProcessTasks_Processes_TaskId",
-                        column: x => x.TaskId,
-                        principalTable: "Processes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TaskProduct",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TaskId = table.Column<int>(nullable: false),
-                    ProductId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TaskProduct", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_TaskProduct_Tasks_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Tasks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_TaskProduct_Resources_TaskId",
-                        column: x => x.TaskId,
-                        principalTable: "Resources",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TaskResource",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TaskId = table.Column<int>(nullable: false),
-                    ResourceId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TaskResource", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_TaskResource_Tasks_ResourceId",
-                        column: x => x.ResourceId,
-                        principalTable: "Tasks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_TaskResource_Resources_TaskId",
-                        column: x => x.TaskId,
-                        principalTable: "Resources",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "8d9f0aaa-2514-48a2-a088-d256050422ff", "Head", "Head", "Head" },
-                    { "871c87e6-da7f-4f7c-9472-9e6e3ec20aa3", "Worker", "Worker", "Worker" }
+                    { "c1c0a0aa-f46f-45a8-896c-7d486048e676", "Head", "Head", "Head" },
+                    { "1d4ce29f-be03-455f-9c66-00675ea410ee", "Worker", "Worker", "Worker" }
                 });
 
             migrationBuilder.InsertData(
@@ -338,8 +282,8 @@ namespace CRM.Migrations
 
             migrationBuilder.InsertData(
                 table: "Tasks",
-                columns: new[] { "Id", "CriticalDate", "IsChangeTime", "IsChangeUsers", "IsImportant", "IsStarted", "IsStopped", "Name", "ParentId", "Priority", "TimeEnd", "TimeReserv", "TimeStart", "TypeId", "UserId" },
-                values: new object[] { 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, true, false, true, "test", null, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null });
+                columns: new[] { "Id", "CriticalDate", "IsChangeTime", "IsChangeUsers", "IsImportant", "IsStarted", "IsStopped", "Name", "ParentId", "Priority", "ProcessId", "ProductId", "ResourceId", "TaskId", "TaskTypeId", "TimeEnd", "TimeReserv", "TimeStart", "UserId" },
+                values: new object[] { 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), true, true, true, false, true, "test", null, 2, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null });
 
             migrationBuilder.InsertData(
                 table: "Types",
@@ -386,44 +330,29 @@ namespace CRM.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProcessTasks_ProcessId",
-                table: "ProcessTasks",
+                name: "IX_Tasks_ProcessId",
+                table: "Tasks",
                 column: "ProcessId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProcessTasks_TaskId",
-                table: "ProcessTasks",
-                column: "TaskId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TaskProduct_ProductId",
-                table: "TaskProduct",
+                name: "IX_Tasks_ProductId",
+                table: "Tasks",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TaskProduct_TaskId",
-                table: "TaskProduct",
-                column: "TaskId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TaskResource_ResourceId",
-                table: "TaskResource",
+                name: "IX_Tasks_ResourceId",
+                table: "Tasks",
                 column: "ResourceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TaskResource_TaskId",
-                table: "TaskResource",
+                name: "IX_Tasks_TaskId",
+                table: "Tasks",
                 column: "TaskId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tasks_ParentId",
+                name: "IX_Tasks_TaskTypeId",
                 table: "Tasks",
-                column: "ParentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Tasks_TypeId",
-                table: "Tasks",
-                column: "TypeId");
+                column: "TaskTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tasks_UserId",
@@ -449,22 +378,13 @@ namespace CRM.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "ProcessTasks");
-
-            migrationBuilder.DropTable(
-                name: "TaskProduct");
-
-            migrationBuilder.DropTable(
-                name: "TaskResource");
+                name: "Tasks");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Processes");
-
-            migrationBuilder.DropTable(
-                name: "Tasks");
 
             migrationBuilder.DropTable(
                 name: "Resources");

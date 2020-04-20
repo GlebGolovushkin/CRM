@@ -1,10 +1,147 @@
-﻿<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <title></title>
-</head>
-<body>
-
-</body>
-</html>
+﻿<mat-toolbar>
+    <span>New Task</span>
+    <span class="fill-remaining-space"></span>
+    <button (click)="onClear()"><i class="fa fa-times"></i></button>
+</mat-toolbar>
+<form [formGroup]="service.taskCard" class="normal-form" (submit)="onSubmit()">
+    <mat-grid-list cols="2" rowHeight="600px">
+        <mat-grid-tile>
+            <div class="controles-container">
+                <input type="hidden" formControlName="id" />
+                <mat-form-field>
+                    <input formControlName="name" matInput placeholder="Name" />
+                    <mat-error>This field is mandatory.</mat-error>
+                </mat-form-field>
+                <div class="row">
+                    <div class="col-md-10">
+                        <mat-form-field>
+                            <mat-select formControlName="process" placeholder="Process" class="process">
+                                <mat-option>None</mat-option>
+                                <ng-container *ngFor="let process of this.processes">
+                                    <mat-option value="{{process.id}}">{{process.name}}</mat-option>
+                                </ng-container>
+                            </mat-select>
+                            <mat-error>This field is mandatory.</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary" (click)="createProcess()"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                    </div>
+                </div>
+                <mat-form-field>
+                    <mat-select formControlName="parent" placeholder="Parent task">
+                        <mat-option>None</mat-option>
+                        <ng-container *ngFor="let task of this.tasks">
+                            <mat-option value="{{task.id}}">{{task.name}}</mat-option>
+                        </ng-container>
+                    </mat-select>
+                </mat-form-field>
+                <div class="row">
+                    <div class="col-md-10">
+                        <mat-form-field>
+                            <mat-select formControlName="type" placeholder="Task type">
+                                <mat-option>None</mat-option>
+                                <ng-container *ngFor="let type of this.types">
+                                    <mat-option value="{{type.id}}">{{type.name}}</mat-option>
+                                </ng-container>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary" (click)="createType()"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                    </div>
+                </div>
+                <mat-form-field>
+                    <mat-select formControlName="user" placeholder="User">
+                        <mat-option>None</mat-option>
+                        <ng-container *ngFor="let user of this.users">
+                            <mat-option value="{{user.id}}">{{user.userName}}</mat-option>
+                        </ng-container>
+                    </mat-select>
+                    <mat-error>This field is mandatory.</mat-error>
+                </mat-form-field>
+                <div>
+                    <mat-slide-toggle color="primary" formControlName="isChangeTime">Let to change critical date?</mat-slide-toggle>
+                </div>
+                <div>
+                    <mat-slide-toggle color="primary" formControlName="isChangeUsers">Let to change users?</mat-slide-toggle>
+                </div>
+                <div>
+                    <mat-slide-toggle color="primary" formControlName="isStarted">Is task started?</mat-slide-toggle>
+                </div>
+                <div>
+                    <mat-slide-toggle color="primary" formControlName="isStopped">Is task stopped?</mat-slide-toggle>
+                </div>
+                <div>
+                    <mat-slide-toggle color="primary" formControlName="isStopped">Is task ended?</mat-slide-toggle>
+                </div>
+            </div>
+</mat-grid-tile>
+        <mat-grid-tile>
+            <div class="controles-container">
+                <mat-form-field>
+                    <mat-label>Choose a start date</mat-label>
+                    <input formControlName="timeStart" matInput [matDatepicker]="startDatePicker">
+                    <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+                    <mat-datepicker #startDatePicker></mat-datepicker>
+                    <mat-error>This field is mandatory.</mat-error>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Choose an end date</mat-label>
+                    <input formControlName="timeEnd" matInput [matDatepicker]="endDatePicker">
+                    <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+                    <mat-datepicker #endDatePicker></mat-datepicker>
+                    <mat-error>This field is mandatory.</mat-error>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Choose a critical date</mat-label>
+                    <input formControlName="timeReserv" matInput [matDatepicker]="criticalDatePicker">
+                    <mat-datepicker-toggle matSuffix [for]="criticalDatePicker"></mat-datepicker-toggle>
+                    <mat-datepicker #criticalDatePicker></mat-datepicker>
+                    <mat-error>This field is mandatory.</mat-error>
+                </mat-form-field>
+                <div class="row">
+                    <div class="col-md-10">
+                        <mat-form-field>
+                            <mat-select formControlName="product" placeholder="Product">
+                                <mat-option>None</mat-option>
+                                <ng-container *ngFor="let product of this.products">
+                                    <mat-option value="{{product.id}}">{{product.name}}</mat-option>
+                                </ng-container>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary" (click)="createProduct()"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-10">
+                        <mat-form-field>
+                            <mat-select formControlName="resource" placeholder="Resource">
+                                <mat-option>None</mat-option>
+                                <ng-container *ngFor="let resource of this.resources">
+                                    <mat-option value="{{resource.id}}">{{resource.name}}</mat-option>
+                                </ng-container>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary" (click)="createProduct()"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                    </div>
+                </div>
+                <mat-form-field>
+                    <mat-select formControlName="priority" placeholder="Priority">
+                        <mat-option value="1">1</mat-option>
+                        <mat-option value="2">2</mat-option>
+                        <mat-option value="3">3</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <div class="button-row float-right">
+                    <button mat-raised-button color="primary" type="submit" [disabled]="service.taskCard.invalid" (click)="onSubmit()">Submit</button>
+                    <button mat-raised-button color="warn" (click)="onClear()">Cancel</button>
+                </div>
+            </div>
+        </mat-grid-tile>
+    </mat-grid-list>
+</form>

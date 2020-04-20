@@ -1,10 +1,30 @@
 ﻿<div>
-    <div class="col-md-8 col-md-offset-2 ">
-        <!--<div>
-            <button mat-raised-button (click)="onCreate()">
-                <mat-icon>add</mat-icon>Create
-            </button>
-        </div>-->
+    <div class="col-md-10 offset-1">
+        <div class="row">
+            <div>
+                <button mat-raised-button (click)="onCreate()" class="btn btn-info">
+                    <i class="fa fa-plus" aria-hidden="true"></i> Add Task
+                </button>
+            </div>
+            <mat-form-field class="margin-left-field">
+                <mat-label>Select User</mat-label>
+                <mat-select [(value)]="this.selectedUserId" (selectionChange)="reRenderGantt()">
+                    <mat-option>None</mat-option>
+                    <ng-container *ngFor="let user of this.users">
+                        <mat-option value="{{user.id}}">{{user.userName}}</mat-option>
+                    </ng-container>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field class="margin-left-field">
+                <mat-label>Select Process</mat-label>
+                <mat-select [(value)]="this.selectedProcessId" (selectionChange)="reRenderGantt()">
+                    <mat-option>None</mat-option>
+                    <ng-container *ngFor="let process of this.processes">
+                        <mat-option value="{{process.id}}">{{process.name}}</mat-option>
+                    </ng-container>
+                </mat-select>
+            </mat-form-field>
+        </div>
         <div id="piechart"></div>
     </div>
 </div>

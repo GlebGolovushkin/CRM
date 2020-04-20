@@ -49,28 +49,6 @@ namespace CRM.Migrations
                         });
                 });
 
-            modelBuilder.Entity("CRM.Data.Entities.ProcessTasks", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("ProcessId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TaskId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProcessId");
-
-                    b.HasIndex("TaskId");
-
-                    b.ToTable("ProcessTasks");
-                });
-
             modelBuilder.Entity("CRM.Data.Entities.Resource", b =>
                 {
                     b.Property<int>("Id")
@@ -127,6 +105,21 @@ namespace CRM.Migrations
                     b.Property<int>("Priority")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ProcessId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ResourceId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TaskId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TaskTypeId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("TimeEnd")
                         .HasColumnType("datetime2");
 
@@ -136,17 +129,20 @@ namespace CRM.Migrations
                     b.Property<DateTime>("TimeStart")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("TypeId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentId");
+                    b.HasIndex("ProcessId");
 
-                    b.HasIndex("TypeId");
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("ResourceId");
+
+                    b.HasIndex("TaskId");
+
+                    b.HasIndex("TaskTypeId");
 
                     b.HasIndex("UserId");
 
@@ -168,50 +164,6 @@ namespace CRM.Migrations
                             TimeReserv = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             TimeStart = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
-                });
-
-            modelBuilder.Entity("CRM.Data.Entities.TaskProduct", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TaskId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("TaskId");
-
-                    b.ToTable("TaskProduct");
-                });
-
-            modelBuilder.Entity("CRM.Data.Entities.TaskResource", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("ResourceId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TaskId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ResourceId");
-
-                    b.HasIndex("TaskId");
-
-                    b.ToTable("TaskResource");
                 });
 
             modelBuilder.Entity("CRM.Data.Entities.TaskType", b =>
@@ -336,14 +288,14 @@ namespace CRM.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "478d1a5c-09b2-4bd6-9ac0-17afa2f092dc",
+                            Id = "c1c0a0aa-f46f-45a8-896c-7d486048e676",
                             ConcurrencyStamp = "Head",
                             Name = "Head",
                             NormalizedName = "Head"
                         },
                         new
                         {
-                            Id = "cafada9a-2158-4200-8a91-01cc0f32d12d",
+                            Id = "1d4ce29f-be03-455f-9c66-00675ea410ee",
                             ConcurrencyStamp = "Worker",
                             Name = "Worker",
                             NormalizedName = "Worker"
@@ -454,64 +406,31 @@ namespace CRM.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("CRM.Data.Entities.ProcessTasks", b =>
-                {
-                    b.HasOne("CRM.Data.Entities.Task", "Task")
-                        .WithMany("Processes")
-                        .HasForeignKey("ProcessId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CRM.Data.Entities.Process", "Process")
-                        .WithMany("Tasks")
-                        .HasForeignKey("TaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("CRM.Data.Entities.Task", b =>
                 {
-                    b.HasOne("CRM.Data.Entities.Task", "Parent")
-                        .WithMany("Children")
-                        .HasForeignKey("ParentId");
+                    b.HasOne("CRM.Data.Entities.Process", "Process")
+                        .WithMany("Tasks")
+                        .HasForeignKey("ProcessId");
 
-                    b.HasOne("CRM.Data.Entities.TaskType", "Type")
-                        .WithMany()
-                        .HasForeignKey("TypeId");
+                    b.HasOne("CRM.Data.Entities.Resource", "Product")
+                        .WithMany("ProductTasks")
+                        .HasForeignKey("ProductId");
+
+                    b.HasOne("CRM.Data.Entities.Resource", "Resource")
+                        .WithMany("ResourceTasks")
+                        .HasForeignKey("ResourceId");
+
+                    b.HasOne("CRM.Data.Entities.Task", null)
+                        .WithMany("Children")
+                        .HasForeignKey("TaskId");
+
+                    b.HasOne("CRM.Data.Entities.TaskType", "TaskType")
+                        .WithMany("Tasks")
+                        .HasForeignKey("TaskTypeId");
 
                     b.HasOne("CRM.Data.Entities.User", "User")
                         .WithMany("Tasks")
                         .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("CRM.Data.Entities.TaskProduct", b =>
-                {
-                    b.HasOne("CRM.Data.Entities.Task", "Task")
-                        .WithMany("Products")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CRM.Data.Entities.Resource", "Product")
-                        .WithMany("TasksP")
-                        .HasForeignKey("TaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("CRM.Data.Entities.TaskResource", b =>
-                {
-                    b.HasOne("CRM.Data.Entities.Task", "Task")
-                        .WithMany("Resources")
-                        .HasForeignKey("ResourceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CRM.Data.Entities.Resource", "Resource")
-                        .WithMany("Tasks")
-                        .HasForeignKey("TaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

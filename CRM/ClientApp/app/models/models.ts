@@ -1,33 +1,47 @@
-﻿export interface User {
-    firstName: string;
-    lastName: string;
-    userName: string;
-    email: string;
-}
-
-export interface Product {
+﻿export class Process {
     id: number;
-    name: string;
-}
-
-export class Resource {
-    id: number;
-    name: string;
-}
-
-export interface Type {
-    id: number;
-    name: string;
-}
-
-export interface Task {
-    id: string;
     timeStart: Date;
     timeEnd: Date;
     name: string;
-    user: User;
-    products: Product[];
-    resources: Resource[];
+    tasks: Task[];
+}
+
+export class User {
+    firstName: string;
+    lastName?: any;
+    tasks: Task[];
+    id: string;
+    userName: string;
+    normalizedUserName: string;
+    email: string;
+    normalizedEmail: string;
+    emailConfirmed: boolean;
+    passwordHash: string;
+    securityStamp: string;
+    concurrencyStamp: string;
+    phoneNumber?: string;
+    phoneNumberConfirmed: boolean;
+    twoFactorEnabled: boolean;
+    lockoutEnd?: any;
+    lockoutEnabled: boolean;
+    accessFailedCount: number;
+}
+
+export class Task {
+    id: number;
+    timeStart: Date;
+    timeEnd: Date;
+    criticalDate: Date;
+    name: string;
+    product: Product;
+    process: Process;
+    parentId?: number;
+    processId?: number;
+    resourceId?: number;
+    productId?: number;
+    taskTypeId?: number;
+    userId: string;
+    resource: Product;
     type: Type;
     timeReserv: Date;
     priority: number;
@@ -36,28 +50,45 @@ export interface Task {
     isChangeUsers: boolean;
     isStarted: boolean;
     isStopped: boolean;
-    parent: Task;
-    children: Task[];
+    children?: Task[];
+    parent?: Task;
+    user: User;
 }
 
-export class TaskView {
-    id: string;
-    name: string;
-    timeStart: Date;
-    timeEnd: Date;
-    products: Product[];
-    resources: Resource[];
-    type: Type;
-    timeReserv: Date;
-    parent: string;
-    resource: number[];
-}
-
-export interface Process {
+export class Type {
     id: number;
-    timeStart: Date;
-    timeEnd: Date;
     name: string;
     tasks: Task[];
 }
 
+export class Product {
+    id: number;
+    name: string;
+    resourceTasks: Task[];
+    productTasks: Task[];
+}
+
+export class Resource {
+    id: number;
+    name: string;
+    resourceTasks: Task[];
+    productTasks: Task[];
+}
+
+export class TaskView {
+    id: number;
+    name: string;
+    timeStart: Date;
+    timeEnd: Date;
+    product: Product;
+    resource: Resource;
+    type: Type;
+    timeReserv: Date;
+    parent?: number;
+    resourceIds: string[];
+}
+
+export class ResourceView {
+    id: string;
+    name: string;
+}

@@ -24,58 +24,25 @@ namespace CRM.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<ProcessTasks>()
-                .HasOne(pt => pt.Process)
-                .WithMany(p => p.Tasks)
-                .HasForeignKey(pt => pt.TaskId);
-
-            modelBuilder.Entity<ProcessTasks>()
-                .HasOne(pt => pt.Task)
-                .WithMany(t => t.Processes)
-                .HasForeignKey(pt => pt.ProcessId);
-
-            modelBuilder.Entity<ProcessTasks>().HasKey(p => p.Id);
-            modelBuilder.Entity<ProcessTasks>()
-            .Property(f => f.Id)
-            .ValueGeneratedOnAdd();
-
-            modelBuilder.Entity<TaskResource>()
-                .HasOne(pt => pt.Resource)
-                .WithMany(p => p.Tasks)
-                .HasForeignKey(pt => pt.TaskId);
-
-            modelBuilder.Entity<TaskResource>()
-                .HasOne(pt => pt.Task)
-                .WithMany(t => t.Resources)
-                .HasForeignKey(pt => pt.ResourceId);
-
-            modelBuilder.Entity<TaskResource>().HasKey(p => p.Id);
-            modelBuilder.Entity<TaskResource>()
-            .Property(f => f.Id)
-            .ValueGeneratedOnAdd();
-
-            modelBuilder.Entity<TaskProduct>()
-                .HasOne(pt => pt.Product)
-                .WithMany(p => p.TasksP)
-                .HasForeignKey(pt => pt.TaskId);
-
-            modelBuilder.Entity<TaskProduct>()
-                .HasOne(pt => pt.Task)
-                .WithMany(t => t.Products)
-                .HasForeignKey(pt => pt.ProductId);
-
-            modelBuilder.Entity<TaskProduct>().HasKey(p => p.Id);
-            modelBuilder.Entity<TaskProduct>()
-            .Property(f => f.Id)
-            .ValueGeneratedOnAdd();
-
             modelBuilder.Entity<Process>()
             .Property(f => f.Id)
             .ValueGeneratedOnAdd();
 
+            modelBuilder.Entity<Process>()
+                .HasMany(type => type.Tasks)
+                .WithOne(t => t.Process);
+
             modelBuilder.Entity<Resource>()
             .Property(f => f.Id)
             .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<Resource>()
+                .HasMany(type => type.ResourceTasks)
+                .WithOne(t => t.Resource);
+
+            modelBuilder.Entity<Resource>()
+                .HasMany(type => type.ProductTasks)
+                .WithOne(t => t.Product);
 
             modelBuilder.Entity<Task>()
             .Property(f => f.Id)
@@ -84,6 +51,10 @@ namespace CRM.Data
             modelBuilder.Entity<TaskType>()
             .Property(f => f.Id)
             .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<TaskType>()
+                .HasMany(type => type.Tasks)
+                .WithOne(t => t.TaskType);
 
             modelBuilder.Entity<TaskType>().HasData(new TaskType
             {
@@ -95,21 +66,6 @@ namespace CRM.Data
             {
                 Id = 1,
                 Name = "Test"
-            });
-
-            modelBuilder.Entity<Task>().HasData(new Task
-            {
-                Id = 1,
-                IsStarted = false,
-                IsChangeTime = true,
-                IsStopped = true,
-                TimeStart = new DateTime(),
-                TimeEnd = new DateTime(),
-                IsChangeUsers = true,
-                IsImportant = true,
-                Name = "test",
-                Priority = 2,
-                TimeReserv = new DateTime()
             });
 
             modelBuilder.Entity<Process>().HasData(new Process
@@ -134,6 +90,21 @@ namespace CRM.Data
                 Name = "Worker",
                 ConcurrencyStamp = "Worker",
                 NormalizedName = "Worker"
+            });
+
+            modelBuilder.Entity<Task>().HasData(new Task
+            {
+                Id = 1,
+                IsStarted = false,
+                IsChangeTime = true,
+                IsStopped = true,
+                TimeStart = new DateTime(),
+                TimeEnd = new DateTime(),
+                IsChangeUsers = true,
+                IsImportant = true,
+                Name = "test",
+                Priority = 2,
+                TimeReserv = new DateTime()
             });
         }
     }

@@ -1,5 +1,6 @@
 ﻿using CRM.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,20 +19,6 @@ namespace CRM.Data
         public IEnumerable<Process> GetAllProcess()
         {
             return ctx.Processes
-                      .Include(p => p.Tasks)
-                      .ThenInclude(p => p.Task)
-                      .ThenInclude(p => p.User)
-                      .Include(p => p.Tasks)
-                      .ThenInclude(p => p.Task)
-                      .ThenInclude(p => p.Resources)
-                      .ThenInclude(p => p.Resource)
-                      .Include(p => p.Tasks)
-                      .ThenInclude(p => p.Task)
-                      .ThenInclude(p => p.Products)
-                      .ThenInclude(p => p.Product)
-                      .Include(p => p.Tasks)
-                      .ThenInclude(p => p.Task)
-                      .ThenInclude(p => p.Type)
                       .OrderBy(p => p.Name)
                       .ToList();
         }
@@ -39,32 +26,72 @@ namespace CRM.Data
         public IEnumerable<Task> GetAllTasks()
         {
             return ctx.Tasks
-                      .Include(p => p.User)
-                      .Include(p => p.Resources)
-                      .ThenInclude(p => p.Resource)
-                      .Include(p => p.Products)
-                      .ThenInclude(p => p.Product)
-                      .Include(p => p.Type)
-                      .OrderBy(p => p.Name)
+                      .OrderBy(p => p.Id)
                       .ToList();
         }
 
         public Task GetTaskById(int id)
         {
             return ctx.Tasks
-                      .Include(p => p.User)
-                      .Include(p => p.Resources)
-                      .ThenInclude(p => p.Resource)
-                      .Include(p => p.Products)
-                      .ThenInclude (p => p.Product)
-                      .Where(p => p.Id == id)
                       .FirstOrDefault();
         }
 
         public IEnumerable<User> GetAllUsers()
         {
             return ctx.Users
-                      .OrderBy(p => p.UserName)
+                      .ToList();
+        }
+
+        public IEnumerable<TaskType> GetAllTypes()
+        {
+            return ctx.Types
+                      .OrderBy(p => p.Id)
+                      .ToList();
+        }
+
+        public bool CreateTask(Task task)
+        {
+            ctx.Tasks.Add(task);
+            return SaveAll();
+        }
+
+        public bool CreateProcess(Process process)
+        {
+            ctx.Processes.Add(process);
+            return SaveAll();
+        }
+
+        public bool CreateResource(Resource resource)
+        {
+            ctx.Resources.Add(resource);
+            return SaveAll();
+        }
+
+        public bool CreateType(TaskType type)
+        {
+            ctx.Types.Add(type);
+            return SaveAll();
+        }
+
+        internal void Upsert(object entity)
+        {
+            ctx.ChangeTracker.TrackGraph(entity, e =>
+            {
+                if (e.Entry.IsKeySet)
+                {
+                    e.Entry.State = EntityState.Modified;
+                }
+                else
+                {
+                    e.Entry.State = EntityState.Added;
+                }
+            });
+        }
+
+        public IEnumerable<Resource> GetallResources()
+        {
+            return ctx.Resources
+                      .OrderBy(p => p.Name)
                       .ToList();
         }
 

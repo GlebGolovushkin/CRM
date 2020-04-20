@@ -4,7 +4,6 @@ using System.Linq;
 using AutoMapper;
 using CRM.Data;
 using CRM.Data.Entities;
-using CRM.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CRM.Controllers
@@ -24,13 +23,26 @@ namespace CRM.Controllers
         public IActionResult Get()
         {
             var tasks = context.GetAllTasks();
-            return Ok(mapper.Map<IEnumerable<Task>, IEnumerable<TaskViewModel>>(tasks));
+            return Ok(tasks);
         }
 
         [HttpGet("{id:int}")]
         public IActionResult Get(int id)
         {
             return Ok(context.GetTaskById(id));
+        }
+
+        [HttpPost]
+        public IActionResult CreateTask([FromBody]Task task)
+        {
+            var res = context.GetAllTasks().FirstOrDefault(t => t.Name == task.Name && t.Process == task.Process);
+            if (res != null)
+            {
+                throw new Exception("Same task");
+            }
+
+            var result = context.CreateTask(task);
+            return Created("", result);
         }
     }
 }

@@ -10,6 +10,6 @@ namespace CRM.Data.Entities
         public DateTime TimeStart { get; set; }
         public DateTime TimeEnd { get; set; }
         public string Name { get; set; }
-        public ICollection<ProcessTasks> Tasks { get; set; }
+        public ICollection<Task> Tasks { get; set; }
     }
 }

@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CRM.Data;
 using CRM.Data.Entities;
-using CRM.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CRM.Controllers
@@ -26,7 +25,20 @@ namespace CRM.Controllers
         public IActionResult Get()
         {
             var processes = reposetory.GetAllProcess();
-            return Ok(mapper.Map<IEnumerable<Process>, IEnumerable<ProcessViewModel>>(processes));
+            return Ok(processes);
+        }
+
+        [HttpPost]
+        public IActionResult CreateProcess([FromBody]Process process)
+        {
+            var res = reposetory.GetAllProcess().FirstOrDefault(t => t.Name == process.Name);
+            if (res != null)
+            {
+                throw new Exception("Same task");
+            }
+
+            var result = reposetory.CreateProcess(process);
+            return Created("", result);
         }
     }
 }

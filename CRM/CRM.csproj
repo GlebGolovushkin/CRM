@@ -6,7 +6,10 @@
 
   <ItemGroup>
     <None Remove="ClientApp\app\processes\processList.component.ts" />
+    <None Remove="ClientApp\app\tasks\process.ts" />
+    <None Remove="ClientApp\app\tasks\productCard\product.ts" />
     <None Remove="ClientApp\app\tasks\task.component.ts" />
+    <None Remove="ClientApp\app\tasks\typeCard\type.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,7 +27,14 @@
 
   <ItemGroup>
     <TypeScriptCompile Include="ClientApp\app\processes\processList.component.ts" />
+    <TypeScriptCompile Include="ClientApp\app\tasks\processCard\process.ts" />
+    <TypeScriptCompile Include="ClientApp\app\tasks\productCard\product.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\app\tasks\task.component.ts" />
+    <TypeScriptCompile Include="ClientApp\app\tasks\typeCard\type.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
   </ItemGroup>
 
 </Project>
