@@ -13,8 +13,8 @@
                     <mat-error>This field is mandatory.</mat-error>
                 </mat-form-field>
                 <div class="row">
-                    <div class="col-md-10">
-                        <mat-form-field>
+                    <div class="col-md-11">
+                        <mat-form-field class="addItem">
                             <mat-select formControlName="process" placeholder="Process" class="process">
                                 <mat-option>None</mat-option>
                                 <ng-container *ngFor="let process of this.processes">
@@ -24,7 +24,7 @@
                             <mat-error>This field is mandatory.</mat-error>
                         </mat-form-field>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <button class="btn btn-primary" (click)="createProcess()"><i class="fa fa-plus" aria-hidden="true"></i></button>
                     </div>
                 </div>
@@ -37,8 +37,8 @@
                     </mat-select>
                 </mat-form-field>
                 <div class="row">
-                    <div class="col-md-10">
-                        <mat-form-field>
+                    <div class="col-md-11">
+                        <mat-form-field class="addItem">
                             <mat-select formControlName="type" placeholder="Task type">
                                 <mat-option>None</mat-option>
                                 <ng-container *ngFor="let type of this.types">
@@ -47,7 +47,7 @@
                             </mat-select>
                         </mat-form-field>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <button class="btn btn-primary" (click)="createType()"><i class="fa fa-plus" aria-hidden="true"></i></button>
                     </div>
                 </div>
@@ -101,8 +101,8 @@
                     <mat-error>This field is mandatory.</mat-error>
                 </mat-form-field>
                 <div class="row">
-                    <div class="col-md-10">
-                        <mat-form-field>
+                    <div class="col-md-11">
+                        <mat-form-field class="addItem">
                             <mat-select formControlName="product" placeholder="Product">
                                 <mat-option>None</mat-option>
                                 <ng-container *ngFor="let product of this.products">
@@ -111,13 +111,13 @@
                             </mat-select>
                         </mat-form-field>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <button class="btn btn-primary" (click)="createProduct()"><i class="fa fa-plus" aria-hidden="true"></i></button>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-10">
-                        <mat-form-field>
+                    <div class="col-md-11">
+                        <mat-form-field class="addItem">
                             <mat-select formControlName="resource" placeholder="Resource">
                                 <mat-option>None</mat-option>
                                 <ng-container *ngFor="let resource of this.resources">
@@ -126,7 +126,7 @@
                             </mat-select>
                         </mat-form-field>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <button class="btn btn-primary" (click)="createProduct()"><i class="fa fa-plus" aria-hidden="true"></i></button>
                     </div>
                 </div>

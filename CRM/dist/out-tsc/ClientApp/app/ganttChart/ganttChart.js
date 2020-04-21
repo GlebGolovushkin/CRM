@@ -3,13 +3,18 @@ import { Component } from "@angular/core";
 import { TaskView, ResourceView } from "../models/models";
 import { TaskCard } from "../tasks/task.component";
 import { Gantt } from "node_modules/@syncfusion/ej2-gantt";
+Gantt.Inject(Selection);
 let GantChart = class GantChart {
     constructor(dataService, dialog) {
         this.dataService = dataService;
         this.dialog = dialog;
         this.tasks = [];
         this.users = [];
+        this.processes = [];
+        this.lastUpdate = new Date();
         this.chartData = [];
+        this.selectedUserId = "";
+        this.selectedProcessId = 0;
         this.tasks = dataService.tasks;
     }
     ngOnInit() {
@@ -22,6 +27,12 @@ let GantChart = class GantChart {
                 this.users = this.dataService.users;
             }
         });
+        this.dataService.loadProccesses()
+            .subscribe(success => {
+            if (success) {
+                this.processes = this.dataService.processes;
+            }
+        });
         this.dataService.loadTasks()
             .subscribe(success => {
             if (success) {
@@ -31,39 +42,49 @@ let GantChart = class GantChart {
         });
     }
     renderGantt(tasks) {
+        var _a;
+        let isUserSelect = ((_a = this.selectedUserId) === null || _a === void 0 ? void 0 : _a.length) > 0;
+        let isProcessSelect = this.selectedProcessId > 0;
+        let add = true;
         this.chartData = [];
         let resources = [];
         let ids = 0;
         tasks.forEach((t) => {
-            let id = "";
-            resources.forEach((r) => {
-                if (r.id == t.userId) {
-                    id = r.id;
+            add = true;
+            if ((isUserSelect && t.userId != this.selectedUserId) || (isProcessSelect && t.processId != this.selectedProcessId)) {
+                add = false;
+            }
+            if (add) {
+                let id = "";
+                resources.forEach((r) => {
+                    if (r.id == t.userId) {
+                        id = r.id;
+                    }
+                });
+                let taskView = new TaskView();
+                if (id !== "") {
+                    taskView.resourceIds = [];
+                    taskView.resourceIds.push(id);
                 }
-            });
-            let taskView = new TaskView();
-            if (id !== "") {
-                taskView.resourceIds = [];
-                taskView.resourceIds.push(id);
+                else {
+                    let res = new ResourceView();
+                    res.id = t.userId;
+                    res.name = this.users.find((u) => u.id == t.userId).userName;
+                    resources.push(res);
+                    taskView.resourceIds = [];
+                    taskView.resourceIds.push(res.id);
+                }
+                taskView.id = t.id;
+                taskView.name = t.name;
+                taskView.parent = t.parentId;
+                taskView.product = t.product;
+                taskView.resource = t.resource;
+                taskView.timeEnd = t.timeEnd;
+                taskView.timeStart = t.timeStart;
+                taskView.timeReserv = t.timeReserv;
+                taskView.type = t.type;
+                this.chartData.push(taskView);
             }
-            else {
-                let res = new ResourceView();
-                res.id = t.userId;
-                res.name = this.users.find((u) => u.id == t.userId).userName;
-                resources.push(res);
-                taskView.resourceIds = [];
-                taskView.resourceIds.push(res.id);
-            }
-            taskView.id = t.id;
-            taskView.name = t.name;
-            taskView.parent = t.parentId;
-            taskView.product = t.product;
-            taskView.resource = t.resource;
-            taskView.timeEnd = t.timeEnd;
-            taskView.timeStart = t.timeStart;
-            taskView.timeReserv = t.timeReserv;
-            taskView.type = t.type;
-            this.chartData.push(taskView);
         });
         this.gantt = new Gantt({
             dataSource: this.chartData,
@@ -84,9 +105,6 @@ let GantChart = class GantChart {
                 leftLabel: "resourceIds",
                 rightLabel: "name"
             },
-            editSettings: {
-                allowAdding: true
-            },
             allowSelection: true
         });
         this.gantt.appendTo("#piechart");
@@ -99,9 +117,16 @@ let GantChart = class GantChart {
             width: "60%"
         });
         dialogRef.afterClosed().subscribe(result => {
+            this.reRenderGantt();
+        });
+    }
+    reRenderGantt() {
+        var time = new Date().getTime() - this.lastUpdate.getTime();
+        if (time > 500) {
             this.gantt.destroy();
             this.renderChart();
-        });
+        }
+        this.lastUpdate = new Date();
     }
 };
 GantChart = __decorate([
