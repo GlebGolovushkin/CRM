@@ -1,29 +1,48 @@
-﻿<div>
+﻿<div class="toolbar">
     <div class="col-md-10 offset-1">
-        <div class="row">
-            <div>
-                <button mat-raised-button (click)="onCreate()" class="btn btn-info">
-                    <i class="fa fa-plus" aria-hidden="true"></i> Add Task
-                </button>
+        <mat-toolbar>
+            <span class="col-md-6"></span>
+            <span class="col-md-2">Top CRM</span>
+            <div class="col-md-3"></div>
+            <div class="col-md-1 float-right">
+                <button class="btn btn-light" (click)="onLogout()">Logout <i class="fas fa-sign-out-alt"></i></button>
             </div>
-            <mat-form-field class="margin-left-field">
-                <mat-label>Select User</mat-label>
-                <mat-select [(value)]="this.selectedUserId" (selectionChange)="reRenderGantt()">
-                    <mat-option>None</mat-option>
-                    <ng-container *ngFor="let user of this.users">
-                        <mat-option value="{{user.id}}">{{user.userName}}</mat-option>
-                    </ng-container>
-                </mat-select>
-            </mat-form-field>
-            <mat-form-field class="margin-left-field">
-                <mat-label>Select Process</mat-label>
-                <mat-select [(value)]="this.selectedProcessId" (selectionChange)="reRenderGantt()">
-                    <mat-option>None</mat-option>
-                    <ng-container *ngFor="let process of this.processes">
-                        <mat-option value="{{process.id}}">{{process.name}}</mat-option>
-                    </ng-container>
-                </mat-select>
-            </mat-form-field>
+        </mat-toolbar>
+    </div>
+</div>
+<div>
+    <div class="col-md-10 offset-1">
+        <div class="card">
+            <div class="row">
+                <div class="col-md-9">
+                    <button mat-raised-button (click)="onCreate()" class="btn btn-info padBtn">
+                        <i class="fa fa-plus" aria-hidden="true"></i> Add Task
+                    </button>
+                    <button *ngIf="this.userService.roleMatch(['Head'])" class="btn btn-secondary padBtn" mat-raised-button (click)="openUsers()"><i class="fas fa-users"></i> Users</button>
+                    <mat-form-field *ngIf="this.userService.roleMatch(['Head'])" class="margin-left-field">
+                        <mat-label>Select User</mat-label>
+                        <mat-select [(value)]="this.selectedUserId" (selectionChange)="reRenderGantt()">
+                            <mat-option>None</mat-option>
+                            <ng-container *ngFor="let user of this.users">
+                                <mat-option value="{{user.id}}">{{user.userName}}</mat-option>
+                            </ng-container>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field *ngIf="this.userService.roleMatch(['Head'])" class="margin-left-field">
+                        <mat-label>Select Process</mat-label>
+                        <mat-select [(value)]="this.selectedProcessId" (selectionChange)="reRenderGantt()">
+                            <mat-option>None</mat-option>
+                            <ng-container *ngFor="let process of this.processes">
+                                <mat-option value="{{process.id}}">{{process.name}}</mat-option>
+                            </ng-container>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="button-row col-md-3 update-btns">
+                    <button *ngIf="this.gantt?.selectedRowIndex > -1" mat-raised-button color="primary" type="submit" (click)="onUpdate()" class="padBtn">Update</button>
+                    <button *ngIf="this.gantt?.selectedRowIndex > -1 && this.userService.roleMatch(['Head'])" mat-raised-button color="warn" (click)="onDelete()" class="padBtn">Delete <i class="fa fa-trash" aria-hidden="true"></i></button>
+                </div>
+            </div>
         </div>
         <div id="piechart"></div>
     </div>

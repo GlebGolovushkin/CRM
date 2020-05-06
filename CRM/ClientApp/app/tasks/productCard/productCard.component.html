@@ -12,7 +12,7 @@
                     <input formControlName="name" matInput placeholder="Name" />
                     <mat-error>This field is mandatory.</mat-error>
                 </mat-form-field>
-                <div class="button-row float-right">
+                <div class="button-row col-md-7 offset-6">
                     <button mat-raised-button color="primary" type="submit" [disabled]="service.productCard.invalid" (click)="onSubmit()">Submit</button>
                     <button mat-raised-button color="warn" (click)="onClear()">Cancel</button>
                 </div>

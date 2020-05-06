@@ -1,9 +1,11 @@
 ﻿<mat-toolbar>
-    <span>New Task</span>
+    <span *ngIf="this.dataService.add">New Task</span>
+    <span *ngIf="!this.dataService.add">Update Task</span>
     <span class="fill-remaining-space"></span>
+    <span class="status" *ngIf="!this.dataService.add && this.dataService.taskCard.value['status']">{{this.dataService.taskCard.value['status']}}</span>
     <button (click)="onClear()"><i class="fa fa-times"></i></button>
 </mat-toolbar>
-<form [formGroup]="service.taskCard" class="normal-form" (submit)="onSubmit()">
+<form [formGroup]="dataService.taskCard" class="normal-form" (submit)="onSubmit()">
     <mat-grid-list cols="2" rowHeight="600px">
         <mat-grid-tile>
             <div class="controles-container">
@@ -14,8 +16,8 @@
                 </mat-form-field>
                 <div class="row">
                     <div class="col-md-11">
-                        <mat-form-field class="addItem">
-                            <mat-select formControlName="process" placeholder="Process" class="process">
+                        <mat-form-field *ngIf="this.dataService.add" class="addItem">
+                            <mat-select  formControlName="process" placeholder="Process" class="process" (selectionChange)="sortTasksByProcess()">
                                 <mat-option>None</mat-option>
                                 <ng-container *ngFor="let process of this.processes">
                                     <mat-option value="{{process.id}}">{{process.name}}</mat-option>
@@ -23,57 +25,65 @@
                             </mat-select>
                             <mat-error>This field is mandatory.</mat-error>
                         </mat-form-field>
+                        <mat-form-field *ngIf="!this.dataService.add">
+                            <mat-label>Process</mat-label>
+                            <input matInput *ngIf="!this.dataService.add" [disabled]="true">{{this.dataService.taskCard.value["process"]}}
+                        </mat-form-field>
                     </div>
-                    <div class="col-md-1">
+                    <div class="col-md-1" *ngIf="this.dataService.add">
                         <button class="btn btn-primary" (click)="createProcess()"><i class="fa fa-plus" aria-hidden="true"></i></button>
                     </div>
                 </div>
-                <mat-form-field>
-                    <mat-select formControlName="parent" placeholder="Parent task">
+                <mat-form-field *ngIf="this.dataService.add">
+                    <mat-label>Parent task</mat-label>
+                    <mat-select formControlName="parent" placeholderr="Parent task">
                         <mat-option>None</mat-option>
                         <ng-container *ngFor="let task of this.tasks">
                             <mat-option value="{{task.id}}">{{task.name}}</mat-option>
                         </ng-container>
                     </mat-select>
                 </mat-form-field>
+                <mat-form-field *ngIf="!this.dataService.add">
+                    <mat-label>Parent task</mat-label>
+                    <input matInput *ngIf="!this.dataService.add" [disabled]="true">{{this.dataService.taskCard.value["parent"]}}
+                </mat-form-field>
                 <div class="row">
                     <div class="col-md-11">
-                        <mat-form-field class="addItem">
-                            <mat-select formControlName="type" placeholder="Task type">
+                        <mat-form-field class="addItem" *ngIf="this.dataService.add">
+                            <mat-select formControlName="type" placeholder="Task type" (selectionChange)="sortUsersById()">
                                 <mat-option>None</mat-option>
                                 <ng-container *ngFor="let type of this.types">
                                     <mat-option value="{{type.id}}">{{type.name}}</mat-option>
                                 </ng-container>
                             </mat-select>
                         </mat-form-field>
+                        <mat-form-field *ngIf="!this.dataService.add">
+                            <mat-label>Task type</mat-label>
+                            <input matInput *ngIf="!this.dataService.add" [disabled]="true">{{this.dataService.taskCard.value["type"]}}
+                        </mat-form-field>
                     </div>
-                    <div class="col-md-1">
+                    <div class="col-md-1" *ngIf="this.dataService.add">
                         <button class="btn btn-primary" (click)="createType()"><i class="fa fa-plus" aria-hidden="true"></i></button>
                     </div>
                 </div>
-                <mat-form-field>
+                <mat-form-field *ngIf="(this.dataService.add && this.userService.roleMatch(['Head'])) || (!this.dataService.add && this.dataService.taskCard.value['isChangeUsers'])">
                     <mat-select formControlName="user" placeholder="User">
                         <mat-option>None</mat-option>
                         <ng-container *ngFor="let user of this.users">
-                            <mat-option value="{{user.id}}">{{user.userName}}</mat-option>
+                            <mat-option *ngIf="user.numberOfTasksByType == null || user.numberOfTasksByType==0" value="{{user.id}}">{{user.userName}}</mat-option>
+                            <mat-option *ngIf="user.numberOfTasksByType>0" value="{{user.id}}">{{user.userName}} ({{user.numberOfTasksByType}})</mat-option>
                         </ng-container>
                     </mat-select>
-                    <mat-error>This field is mandatory.</mat-error>
+                </mat-form-field>
+                <mat-form-field *ngIf="!this.dataService.add && !this.dataService.taskCard.value['isChangeUsers']">
+                    <mat-label>User name</mat-label>
+                    <input matInput [disabled]="true">{{this.dataService.taskCard.value["user"]}}
                 </mat-form-field>
                 <div>
-                    <mat-slide-toggle color="primary" formControlName="isChangeTime">Let to change critical date?</mat-slide-toggle>
+                    <mat-slide-toggle [disabled]="!this.dataService.add" color="primary" formControlName="isChangeTime">Let to change critical date?</mat-slide-toggle>
                 </div>
                 <div>
-                    <mat-slide-toggle color="primary" formControlName="isChangeUsers">Let to change users?</mat-slide-toggle>
-                </div>
-                <div>
-                    <mat-slide-toggle color="primary" formControlName="isStarted">Is task started?</mat-slide-toggle>
-                </div>
-                <div>
-                    <mat-slide-toggle color="primary" formControlName="isStopped">Is task stopped?</mat-slide-toggle>
-                </div>
-                <div>
-                    <mat-slide-toggle color="primary" formControlName="isStopped">Is task ended?</mat-slide-toggle>
+                    <mat-slide-toggle [disabled]="!this.dataService.add" color="primary" formControlName="isChangeUsers">Let to change users?</mat-slide-toggle>
                 </div>
             </div>
 </mat-grid-tile>
@@ -95,50 +105,69 @@
                 </mat-form-field>
                 <mat-form-field>
                     <mat-label>Choose a critical date</mat-label>
-                    <input formControlName="timeReserv" matInput [matDatepicker]="criticalDatePicker">
+                    <input [disabled]="!this.dataService.add && !this.dataService.taskCard.value['isChangeTime']" formControlName="criticalDate" matInput [matDatepicker]="criticalDatePicker">
                     <mat-datepicker-toggle matSuffix [for]="criticalDatePicker"></mat-datepicker-toggle>
                     <mat-datepicker #criticalDatePicker></mat-datepicker>
                     <mat-error>This field is mandatory.</mat-error>
                 </mat-form-field>
                 <div class="row">
                     <div class="col-md-11">
-                        <mat-form-field class="addItem">
-                            <mat-select formControlName="product" placeholder="Product">
+                        <mat-form-field class="addItem" *ngIf="this.dataService.add">
+                            <mat-select formControlName="product" placeholder="Product" >
                                 <mat-option>None</mat-option>
                                 <ng-container *ngFor="let product of this.products">
                                     <mat-option value="{{product.id}}">{{product.name}}</mat-option>
                                 </ng-container>
                             </mat-select>
                         </mat-form-field>
+                        <mat-form-field *ngIf="!this.dataService.add">
+                            <mat-label>Product</mat-label>
+                            <input matInput *ngIf="!this.dataService.add" [disabled]="true">{{this.dataService.taskCard.value["product"]}}
+                        </mat-form-field>
                     </div>
-                    <div class="col-md-1">
+                    <div class="col-md-1" *ngIf="this.dataService.add">
                         <button class="btn btn-primary" (click)="createProduct()"><i class="fa fa-plus" aria-hidden="true"></i></button>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-11">
-                        <mat-form-field class="addItem">
-                            <mat-select formControlName="resource" placeholder="Resource">
+                        <mat-form-field class="addItem" *ngIf="this.dataService.add">
+                            <mat-select formControlName="resource" placeholder="Resource" >
                                 <mat-option>None</mat-option>
                                 <ng-container *ngFor="let resource of this.resources">
                                     <mat-option value="{{resource.id}}">{{resource.name}}</mat-option>
                                 </ng-container>
                             </mat-select>
                         </mat-form-field>
+                        <mat-form-field *ngIf="!this.dataService.add">
+                            <mat-label>Resource</mat-label>
+                            <input matInput *ngIf="!this.dataService.add" [disabled]="true">{{this.dataService.taskCard.value["resource"]}}
+                        </mat-form-field>
                     </div>
-                    <div class="col-md-1">
+                    <div class="col-md-1" *ngIf="this.dataService.add">
                         <button class="btn btn-primary" (click)="createProduct()"><i class="fa fa-plus" aria-hidden="true"></i></button>
                     </div>
                 </div>
-                <mat-form-field>
+                <mat-form-field *ngIf="this.dataService.add">
                     <mat-select formControlName="priority" placeholder="Priority">
                         <mat-option value="1">1</mat-option>
                         <mat-option value="2">2</mat-option>
                         <mat-option value="3">3</mat-option>
                     </mat-select>
                 </mat-form-field>
-                <div class="button-row float-right">
-                    <button mat-raised-button color="primary" type="submit" [disabled]="service.taskCard.invalid" (click)="onSubmit()">Submit</button>
+                <mat-form-field *ngIf="!this.dataService.add">
+                    <mat-label>Priority</mat-label>
+                    <input matInput [disabled]="true">{{this.dataService.taskCard.value["priority"]}}
+                </mat-form-field>
+                <mat-form-field *ngIf="!this.dataService.add">
+                    <mat-select formControlName="status" placeholder="Status">
+                        <ng-container *ngFor="let status of this.statuses">
+                            <mat-option value="{{status.id}}">{{status.name}}</mat-option>
+                        </ng-container>
+                    </mat-select>
+                </mat-form-field>
+                <div class="button-row col-md-7 offset-6">
+                    <button mat-raised-button color="primary" type="submit" [disabled]="dataService.taskCard.invalid" (click)="onSubmit()">Submit</button>
                     <button mat-raised-button color="warn" (click)="onClear()">Cancel</button>
                 </div>
             </div>

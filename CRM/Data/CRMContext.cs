@@ -19,6 +19,7 @@ namespace CRM.Data
         public DbSet<Process> Processes { get; set; }
         public DbSet<TaskType> Types { get; set; }
         public DbSet<Resource> Resources { get; set; }
+        public DbSet<Status> Statuses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -95,16 +96,31 @@ namespace CRM.Data
             modelBuilder.Entity<Task>().HasData(new Task
             {
                 Id = 1,
-                IsStarted = false,
                 IsChangeTime = true,
-                IsStopped = true,
                 TimeStart = new DateTime(),
                 TimeEnd = new DateTime(),
                 IsChangeUsers = true,
-                IsImportant = true,
                 Name = "test",
                 Priority = 2,
                 TimeReserv = new DateTime()
+            });
+
+            modelBuilder.Entity<Status>().HasData(new Status
+            {
+                Id = 1,
+                Name = "Started"
+            });
+
+            modelBuilder.Entity<Status>().HasData(new Status
+            {
+                Id = 2,
+                Name = "Not Started"
+            });
+
+            modelBuilder.Entity<Status>().HasData(new Status
+            {
+                Id = 3,
+                Name = "Stopped"
             });
         }
     }

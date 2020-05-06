@@ -26,7 +26,8 @@
     "@syncfusion/ej2-gantt": "18.1.44",
     "@angular/material": "9.2.1",
     "@angular/cdk": "9.2.1",
-    "font-awesome": "4.7.0"
+    "font-awesome": "4.7.0",
+    "ngx-toastr": "12.0.1"
   },
   "devDependencies": {
     "bootstrap": "^4.4.1",
@@ -56,6 +57,7 @@
     "@syncfusion/ej2-gantt": "18.1.44",
     "@angular/material": "9.2.1",
     "@angular/cdk": "9.2.1",
-    "font-awesome": "4.7.0"
+    "font-awesome": "4.7.0",
+    "ngx-toastr": "12.0.1"
   }
 }

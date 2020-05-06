@@ -1,9 +1,10 @@
 ﻿import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Task, Process, Product, Resource, Type, User } from "../models/models";
+import { Task, Process, Product, Resource, Type, User, UserByType, Status } from "../models/models";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators"
 import { FormGroup, FormControl, Validators } from "@angular/forms"
+import { TaskType } from '@syncfusion/ej2-gantt';
 
 @Injectable()
 export class DataService {
@@ -35,7 +36,66 @@ export class DataService {
     }
 
     addTask(task: Task) {
-        this.http.post(this.rootUrl + 'tasks/', task)
+        this.http.post(this.rootUrl + 'tasks/add/', task)
+            .toPromise()
+            .then(res => this.loadTasks())
+            .catch(err => {
+                console.log(err);
+            });
+    }
+
+    updateTask(task: Task) {
+        this.http.post(this.rootUrl + 'tasks/update/', task)
+            .toPromise()
+            .then(res => this.loadTasks())
+            .catch(err => {
+                console.log(err);
+            });
+    }
+
+    updateUser(user: User) {
+        var res = new Date().getTime() - this.lastUserUpdate.getTime();
+        if (res > 500) {
+            this.lastUserUpdate = new Date();
+            this.http.post(this.rootUrl + 'users/update/', user)
+                .toPromise()
+                .then(res => this.loadUsers())
+                .catch(err => {
+                    console.log(err);
+                });
+        }
+    }
+
+    deleteUser(id: string) {
+        this.http.delete(this.rootUrl + 'users/' + id)
+            .toPromise()
+            .then(res => this.loadUsers())
+            .catch(err => {
+                console.log(err);
+            });
+    }
+
+    getSortUsersByTypeId(id: number) {
+        return this.http.get(this.rootUrl + "users/bytype?id=" + id)
+            .toPromise()
+            .then((res: UserByType[]) => {
+                this.usersByType = res;
+                this.users.forEach((u) => {
+                    this.usersByType.forEach((ut) => {
+                        if (ut.key == u.id) {
+                            u.numberOfTasksByType = ut.value;
+                        }
+                    })
+                })
+                this.users = this.users.sort((u1, u2) => u1.numberOfTasksByType > u2.numberOfTasksByType ? -1 : 1);
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    }
+
+    deleteTask(task: any) {
+        this.http.delete(this.rootUrl + 'tasks/' + task)
             .toPromise()
             .then(res => this.loadTasks())
             .catch(err => {
@@ -70,26 +130,69 @@ export class DataService {
             });
     }
 
-    addTaskFromTaskCard() {
+    addTaskFromTaskCard(id:string="") {
         let task: Task = new Task();
         task.isChangeTime = this.taskCard.value["isChangeTime"];
         task.isChangeUsers = this.taskCard.value["isChangeUsers"];
-        task.isImportant = this.taskCard.value["isImportant"];
-        task.isStarted = this.taskCard.value["isStarted"];
-        task.isStopped = this.taskCard.value["isStopped"];
         task.name = this.taskCard.value["name"];
         task.priority = this.taskCard.value["priority"];
         task.timeEnd = this.taskCard.value["timeEnd"];
-        task.timeReserv = this.taskCard.value["timeReserv"];
+        task.criticalDate = this.taskCard.value["criticalDate"];
         task.timeStart = this.taskCard.value["timeStart"];
         task.parentId = this.taskCard.value["parent"];
         task.productId = this.taskCard.value["product"];
         task.resourceId = this.taskCard.value["resource"];
-        task.userId = this.taskCard.value["user"];
+        task.userId = id? id : this.taskCard.value["user"];
         task.taskTypeId = this.taskCard.value["type"];
         task.processId = this.taskCard.value["process"];
 
         this.addTask(task);
+    }
+
+    updateTaskFromTaskCard() {
+        let task = this.tasks.find((t) => t.id == this.taskCard.value["id"]);
+        task.name = this.taskCard.value["name"];
+        task.timeEnd = this.taskCard.value["timeEnd"];
+        task.criticalDate = this.taskCard.value["criticalDate"];
+        task.timeStart = this.taskCard.value["timeStart"];
+        task.statusId = this.taskCard.value["status"];
+        if (this.taskCard.value["user"]) {
+            if (task.userId != this.taskCard.value["user"]) {
+                task.userId = this.taskCard.value["user"];
+            }
+        }
+
+        this.updateTask(task);
+    }
+
+    updateUserFromCard() {
+        let user = this.users.find((t) => t.id == this.userCard.value["id"]);
+        user.email = this.userCard.value["email"];
+        user.userName = this.userCard.value["name"];
+        user.role = this.userCard.value["role"];
+
+        this.updateUser(user);
+    }
+
+    initTaskCardById(id: any) {
+        let t:Task = this.tasks.find((t) => t.id == id);
+        this.taskCard.setValue({
+            id: t.id,
+            name: t.name,
+            status: t.statusId ? this.statuses.find((p) => p.id == t.statusId).name : "",
+            timeStart: t.timeStart,
+            timeEnd: t.timeEnd,
+            product: t.productId ? this.products.find((p) => p.id == t.productId).name : "",
+            resource: t.resourceId ? this.resources.find((p) => p.id == t.resourceId).name : "",
+            user: t.userId ? this.users.find((p) => p.id == t.userId).userName : "",
+            type: t.taskTypeId ? this.types.find((p) => p.id == t.taskTypeId).name : "",
+            criticalDate: t.criticalDate,
+            priority: t.priority,
+            isChangeTime: t.isChangeTime,
+            isChangeUsers: t.isChangeUsers,
+            parent: t.parentId ? this.tasks.find((p) => p.id == t.parentId).name : "",
+            process: t.processId ? this.processes.find((p) => p.id == t.processId).name : "",
+        });
     }
 
     addProcessFromProcessCard() {
@@ -136,6 +239,16 @@ export class DataService {
             )
     }
 
+    loadStatuses(): Observable<boolean> {
+        return this.http.get(this.rootUrl + "statuses")
+            .pipe(
+                map((data: any) => {
+                    this.statuses = data;
+                    return true;
+                })
+            )
+    }
+
     loadUsers(): Observable<boolean> {
         return this.http.get(this.rootUrl + "users")
             .pipe(
@@ -153,6 +266,15 @@ export class DataService {
             timeStart: new Date(),
             timeEnd: new Date()
         });
+    }
+
+    public populateUserCard(user: User) {
+        this.userCard.setValue({
+            id: user.id,
+            name: user.userName,
+            email: user.email,
+            role: user.role
+        })
     }
 
     public initializeTypeCard() {
@@ -175,17 +297,15 @@ export class DataService {
             name: "",
             timeStart: new Date(),
             timeEnd: new Date(),
+            status:'',
             product: '',
             resource: '',
             user: '',
             type: '',
-            timeReserv: new Date(),
+            criticalDate: new Date(),
             priority: 1,
-            isImportant: false,
             isChangeTime: false,
             isChangeUsers: false,
-            isStarted: false,
-            isStopped: false,
             parent: '',
             process: '',
         });
@@ -198,15 +318,13 @@ export class DataService {
         timeEnd: new FormControl(new Date(), Validators.required),
         product: new FormControl(''),
         resource: new FormControl(''),
-        user: new FormControl('', Validators.required),
+        user: new FormControl(''),
         type: new FormControl(''),
-        timeReserv: new FormControl(new Date(), Validators.required),
+        criticalDate: new FormControl(new Date(), Validators.required),
         priority: new FormControl(3),
-        isImportant: new FormControl(false),
         isChangeTime: new FormControl(false),
         isChangeUsers: new FormControl(false),
-        isStarted: new FormControl(false),
-        isStopped: new FormControl(false),
+        status: new FormControl(''),
         parent: new FormControl(new Task()),
         process: new FormControl(new Process(), Validators.required)
     });
@@ -216,6 +334,13 @@ export class DataService {
         name: new FormControl('', Validators.required),
         timeStart: new FormControl(new Date(), Validators.required),
         timeEnd: new FormControl(new Date(), Validators.required)
+    });
+
+    public userCard: FormGroup = new FormGroup({
+        id: new FormControl(0),
+        name: new FormControl('', Validators.required),
+        email: new FormControl('', [Validators.required, Validators.email]),
+        role: new FormControl('', Validators.required)
     });
 
     public typeCard: FormGroup = new FormGroup({
@@ -235,8 +360,12 @@ export class DataService {
 
     public processes: Process[] = []; 
     public resources: Resource[] = []; 
-    public products: Product[] = []; 
+    public products: Product[] = [];
     public types: Type[] = []; 
     public users: User[] = []; 
+    public statuses: Status[] = []; 
     public tasks: Task[] = []; 
+    public add: boolean = true;
+    public lastUserUpdate: Date = new Date();
+    public usersByType: UserByType[] = [];
 }

@@ -28,12 +28,12 @@ namespace CRM.Data.Entities
         public TaskType TaskType { get; set; }
         public DateTime TimeReserv { get; set; }
         public int Priority { get; set; }
-        public bool IsImportant { get; set; }
         public bool IsChangeTime { get; set; }
         public bool IsChangeUsers { get; set; }
-        public bool IsStarted { get; set; }
-        public bool IsStopped { get; set; }
+        public int? StatusId { get; set; }
         public ICollection<Task> Children { get; set; }
         public Process Process { get; set; }
+        public int? ProcessQueuParentId { get; set; }
+        public int? UserQueuParentId { get; set; }
     }
 }

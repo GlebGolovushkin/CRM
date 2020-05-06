@@ -1,0 +1,56 @@
+﻿<div class="jumbtron users">
+    <h1 class="display-4 text-center">Users</h1>
+    <div class="row">
+        <div class="col-md-4">
+            <form [formGroup]="dataService.userCard" class="normal-form" (submit)="onSubmit()">
+                <mat-grid-list cols="1">
+                    <mat-grid-tile>
+                        <div class="controles-container">
+                            <input type="hidden" formControlName="id" />
+                            <mat-form-field>
+                                <input formControlName="name" matInput placeholder="Name" />
+                                <mat-error>This field is mandatory.</mat-error>
+                            </mat-form-field>
+                            <mat-form-field>
+                                <input formControlName="email" matInput placeholder="Email" />
+                                <mat-error>This field is mandatory.</mat-error>
+                            </mat-form-field>
+                            <mat-form-field>
+                                <mat-select formControlName="role" placeholder="Role">
+                                    <ng-container *ngFor="let role of this.roles">
+                                        <mat-option value="{{role.name}}">{{role.name}}</mat-option>
+                                    </ng-container>
+                                </mat-select>
+                                <mat-error>This field is mandatory.</mat-error>
+                            </mat-form-field>
+                            <div class="button-row col-md-12">
+                                <button mat-raised-button class="btn btn-success" type="submit" [disabled]="dataService.userCard.invalid" (click)="onSubmit()">Submit</button>
+                                <button mat-raised-button color="primary" (click)="onCancel()">Cancel</button>
+                            </div>
+                        </div>
+                    </mat-grid-tile>
+                </mat-grid-list>
+            </form>
+        </div>
+        <div class="col-md-8">
+            <div id="table-wrapper">
+                <div id="table-scroll">
+                    <table class="table table-hover">
+                        <thead>
+                            <td><b>Name</b></td>
+                            <td><b>Email</b></td>
+                            <td><b>Work</b></td>
+                            <td></td>
+                        </thead>
+                        <tr *ngFor="let user of users" (click)="populateForm(user)">
+                            <td>{{user.userName}}</td>
+                            <td>{{user.email}}</td>
+                            <td>{{user.role!= null ? user.role: ""}}</td>
+                            <td (click)="onDelete(user.id)"><i class="fa fa-trash" aria-hidden="true"></i></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

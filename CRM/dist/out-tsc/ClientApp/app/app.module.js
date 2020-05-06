@@ -1,8 +1,8 @@
 import { __decorate } from "tslib";
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from "@angular/common/http";
-import { ReactiveFormsModule } from "@angular/forms";
+import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
+import { ReactiveFormsModule, FormsModule } from "@angular/forms";
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ProcessList } from './processes/processList.component';
@@ -23,6 +23,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { ProcessCard } from './tasks/processCard/process';
 import { ProductCard } from './tasks/productCard/product';
 import { TypeCard } from './tasks/typeCard/type';
+import { ToastrModule } from 'ngx-toastr';
+import { UserComponent } from './user/user.component';
+import { RegistrationComponent } from './user/registration/registration.component';
+import { LoginComponent } from './user/login/login.component';
+import { UserService } from './shared/user.service';
+import { ForbiddenComponent } from './forbidden/forbidden.component';
+import { AuthInterceptor } from './auth/auth.interceptor';
+import { UserListComponent } from './userList/userList.component';
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -34,7 +42,12 @@ AppModule = __decorate([
             TaskCard,
             ProcessCard,
             ProductCard,
-            TypeCard
+            TypeCard,
+            UserComponent,
+            RegistrationComponent,
+            LoginComponent,
+            ForbiddenComponent,
+            UserListComponent
         ],
         imports: [
             BrowserModule,
@@ -51,7 +64,9 @@ AppModule = __decorate([
             MatNativeDateModule,
             MatSlideToggleModule,
             MatButtonModule,
-            MatFormFieldModule
+            MatFormFieldModule,
+            FormsModule,
+            ToastrModule.forRoot(),
         ],
         entryComponents: [
             TaskCard,
@@ -61,7 +76,13 @@ AppModule = __decorate([
         ],
         providers: [
             DataService,
-            MatDatepickerModule
+            UserService,
+            MatDatepickerModule,
+            {
+                provide: HTTP_INTERCEPTORS,
+                useClass: AuthInterceptor,
+                multi: true
+            }
         ],
         bootstrap: [AppComponent]
     })

@@ -71,6 +71,38 @@ namespace CRM.Migrations
                         });
                 });
 
+            modelBuilder.Entity("CRM.Data.Entities.Status", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Statuses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Started"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Not Started"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Stopped"
+                        });
+                });
+
             modelBuilder.Entity("CRM.Data.Entities.Task", b =>
                 {
                     b.Property<int>("Id")
@@ -87,15 +119,6 @@ namespace CRM.Migrations
                     b.Property<bool>("IsChangeUsers")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsImportant")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsStarted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsStopped")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
@@ -108,10 +131,16 @@ namespace CRM.Migrations
                     b.Property<int?>("ProcessId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ProcessQueuParentId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("ProductId")
                         .HasColumnType("int");
 
                     b.Property<int?>("ResourceId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("StatusId")
                         .HasColumnType("int");
 
                     b.Property<int?>("TaskId")
@@ -131,6 +160,9 @@ namespace CRM.Migrations
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("UserQueuParentId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -155,9 +187,6 @@ namespace CRM.Migrations
                             CriticalDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsChangeTime = true,
                             IsChangeUsers = true,
-                            IsImportant = true,
-                            IsStarted = false,
-                            IsStopped = true,
                             Name = "test",
                             Priority = 2,
                             TimeEnd = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -288,14 +317,14 @@ namespace CRM.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "c1c0a0aa-f46f-45a8-896c-7d486048e676",
+                            Id = "aa5be96a-1c6d-42e0-902d-cba6d5867afc",
                             ConcurrencyStamp = "Head",
                             Name = "Head",
                             NormalizedName = "Head"
                         },
                         new
                         {
-                            Id = "1d4ce29f-be03-455f-9c66-00675ea410ee",
+                            Id = "3f7e3f39-d47c-4ae3-8aa8-601b97ed2f89",
                             ConcurrencyStamp = "Worker",
                             Name = "Worker",
                             NormalizedName = "Worker"

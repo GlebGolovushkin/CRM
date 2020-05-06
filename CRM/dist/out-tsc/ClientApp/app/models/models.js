@@ -14,4 +14,14 @@ export class TaskView {
 }
 export class ResourceView {
 }
+export class UserRole {
+}
+export class Role {
+}
+export class UserByType {
+}
+export class UserProfile {
+}
+export class Status {
+}
 //# sourceMappingURL=models.js.map

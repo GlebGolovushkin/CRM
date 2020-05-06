@@ -1,10 +1,11 @@
 ﻿import { Component } from "@angular/core";
 import { DataService } from "../shared/dataService";
-import { Process, Resource, Product, Type, User, Task } from '../models/models';
+import { Process, Resource, Product, Type, User, Task, Status } from '../models/models';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { ProcessCard } from './processCard/process';
 import { TypeCard } from './typeCard/type';
 import { ProductCard } from './productCard/product';
+import { UserService } from '../shared/user.service';
 
 @Component({
     selector: "task",
@@ -12,39 +13,46 @@ import { ProductCard } from './productCard/product';
     styleUrls: []
 })
 
-export class TaskCard{
-    constructor(public service: DataService, private dialogRef: MatDialogRef<TaskCard>, private dialog: MatDialog) {
-        this.service.loadTasks()
+export class TaskCard {
+    constructor(public dataService: DataService, private dialogRef: MatDialogRef<TaskCard>, private dialog: MatDialog, public userService: UserService) {
+        this.dataService.loadStatuses()
             .subscribe(success => {
                 if (success) {
-                    this.tasks = this.service.tasks;
+                    this.statuses = this.dataService.statuses;
                 }
             });
-        this.service.loadProccesses()
+        this.dataService.loadTasks()
             .subscribe(success => {
                 if (success) {
-                    this.processes = this.service.processes;
+                    this.tasks = this.dataService.tasks;
                 }
             });
-        this.service.loadResources()
+        this.dataService.loadProccesses()
             .subscribe(success => {
                 if (success) {
-                    this.resources = this.service.resources;
-                    this.products = this.service.products;
+                    this.processes = this.dataService.processes;
                 }
             });
-        this.service.loadTypes()
+        this.dataService.loadResources()
             .subscribe(success => {
                 if (success) {
-                    this.types = this.service.types;
+                    this.resources = this.dataService.resources;
+                    this.products = this.dataService.products;
                 }
             });
-        this.service.loadUsers()
+        this.dataService.loadTypes()
             .subscribe(success => {
                 if (success) {
-                    this.users = this.service.users;
+                    this.types = this.dataService.types;
                 }
             });
+        this.dataService.loadUsers()
+            .subscribe(success => {
+                if (success) {
+                    this.users = this.dataService.users;
+                }
+            });
+        this.userService.getUserProfile();
     }
 
     public processes: Process[] = [];
@@ -52,26 +60,39 @@ export class TaskCard{
     public products: Product[] = [];
     public types: Type[] = [];
     public users: User[] = [];
-    public tasks: Task[] = []; 
+    public tasks: Task[] = [];
+    public statuses: Status[] = []; 
 
     public onClear() {
-        this.service.taskCard.reset();
-        this.service.initializeTaskCard();
+        this.dataService.taskCard.reset();
+        this.dataService.initializeTaskCard();
         this.dialogRef.close();
     }
 
     public onSubmit() {
-        if (this.service.taskCard.valid) {
-            this.service.addTaskFromTaskCard();
+        if (this.dataService.taskCard.valid) {
+            if (this.dataService.add) {
+                if (!this.dataService.taskCard.value["user"]) {
+                    this.dataService.addTaskFromTaskCard(this.userService.userProfile.id);
+                }
+                this.dataService.addTaskFromTaskCard();
+            }
+            else {
+                this.dataService.updateTaskFromTaskCard();
+            }
         }
 
         this.onClear();
     }
 
+    public onDelete() {
+        this.dataService.deleteTask(this.dataService.taskCard.value["id"])
+    }
+
 
 
     public createProcess(): void {
-        this.service.initializeTaskCard();
+        this.dataService.initializeTaskCard();
         const dialogRef = this.dialog.open(ProcessCard, {
             disableClose: true,
             autoFocus: true,
@@ -79,8 +100,25 @@ export class TaskCard{
         });
     }
 
+    public sortUsersById() {
+        this.dataService.getSortUsersByTypeId(this.dataService.taskCard.value["type"]);
+        this.users = this.dataService.users;
+    }
+
+    public sortTasksByProcess() {
+        this.dataService.loadTasks()
+            .subscribe(success => {
+                if (success) {
+                    this.tasks = this.dataService.tasks;
+                    if (this.dataService.taskCard.value["process"] != null) {
+                        this.tasks = this.tasks.filter(t => t.processId == this.dataService.taskCard.value["process"]);
+                    }
+                }
+            });
+    }
+
     public createType(): void {
-        this.service.initializeTypeCard();
+        this.dataService.initializeTypeCard();
         const dialogRef = this.dialog.open(TypeCard, {
             disableClose: true,
             autoFocus: true,
@@ -89,7 +127,7 @@ export class TaskCard{
     }
 
     public createProduct(): void {
-        this.service.initializeProductCard();
+        this.dataService.initializeProductCard();
         const dialogRef = this.dialog.open(ProductCard, {
             disableClose: true,
             autoFocus: true,

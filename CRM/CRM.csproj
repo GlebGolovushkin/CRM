@@ -10,6 +10,7 @@
     <None Remove="ClientApp\app\tasks\productCard\product.ts" />
     <None Remove="ClientApp\app\tasks\task.component.ts" />
     <None Remove="ClientApp\app\tasks\typeCard\type.ts" />
+    <None Remove="ClientApp\app\userList\userList.component.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,7 +23,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.3" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,6 +36,12 @@
     <TypeScriptCompile Include="ClientApp\app\tasks\typeCard\type.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\app\userList\userList.component.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ClientApp\app\user\login\" />
+    <Folder Include="ClientApp\app\user\registration\" />
   </ItemGroup>
 
 </Project>

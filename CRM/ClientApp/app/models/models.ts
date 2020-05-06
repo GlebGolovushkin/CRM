@@ -7,6 +7,7 @@
 }
 
 export class User {
+    numberOfTasksByType: number;
     firstName: string;
     lastName?: any;
     tasks: Task[];
@@ -25,6 +26,7 @@ export class User {
     lockoutEnd?: any;
     lockoutEnabled: boolean;
     accessFailedCount: number;
+    role: string;
 }
 
 export class Task {
@@ -43,16 +45,15 @@ export class Task {
     userId: string;
     resource: Product;
     type: Type;
-    timeReserv: Date;
     priority: number;
-    isImportant: boolean;
     isChangeTime: boolean;
     isChangeUsers: boolean;
-    isStarted: boolean;
-    isStopped: boolean;
     children?: Task[];
     parent?: Task;
     user: User;
+    statusId: number;
+    userQueuParentId: number;
+    processQueuParentId: number;
 }
 
 export class Type {
@@ -83,12 +84,40 @@ export class TaskView {
     product: Product;
     resource: Resource;
     type: Type;
-    timeReserv: Date;
+    criticalDate: Date;
     parent?: number;
     resourceIds: string[];
 }
 
 export class ResourceView {
     id: string;
+    name: string;
+}
+
+export class UserRole {
+    userId: string;
+    roleId: string;
+}
+
+export class Role {
+    id: string;
+    name: string;
+    normalizedName: string;
+    concurrencyStamp: string;
+}
+
+export class UserByType {
+    key: string;
+    value: number;
+}
+
+export class UserProfile {
+    id: string;
+    userName: string;
+    email: string;
+}
+
+export class Status {
+    id: number;
     name: string;
 }

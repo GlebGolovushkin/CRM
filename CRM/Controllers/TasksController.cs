@@ -33,6 +33,7 @@ namespace CRM.Controllers
         }
 
         [HttpPost]
+        [Route("Add")]
         public IActionResult CreateTask([FromBody]Task task)
         {
             var res = context.GetAllTasks().FirstOrDefault(t => t.Name == task.Name && t.Process == task.Process);
@@ -42,6 +43,27 @@ namespace CRM.Controllers
             }
 
             var result = context.CreateTask(task);
+            return Created("", result);
+        }
+
+        [HttpPost]
+        [Route("Update")]
+        public IActionResult UpdateTask([FromBody]Task task)
+        {
+            var result = context.UpdateTask(task);
+            return Created("", result);
+        }
+
+        [HttpDelete("{id:int}")]
+        public IActionResult DeleteTask(int id)
+        {
+            var res = context.GetAllTasks().FirstOrDefault(t => t.Id == id);
+            if (res == null)
+            {
+                return null;
+                //throw new Exception("Same task");
+            }
+            var result = context.DeleteTask(id);
             return Created("", result);
         }
     }
